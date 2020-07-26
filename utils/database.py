@@ -8,17 +8,16 @@
 from twisted.enterprise import adbapi
 from twisted.internet import reactor
 import pymysql
-from .logger import Logger
 from .common import Common
 
 class MysqlTwisted():
 
-    def __init__(self, dbpool):
+    def __init__(self, dbpool, main_logger):
         self.dbpool = dbpool
-        self.logger = Logger('yanzhipeng', 'yzp1.log').getLog()
+        self.main_logger = main_logger
 
     @classmethod
-    def from_settings(cls):
+    def from_settings(cls, main_logger):
         dbparms = dict(
             host='127.0.0.1',
             db='cloud_smile',
@@ -29,7 +28,7 @@ class MysqlTwisted():
             use_unicode=True,
         )
         dbpool = adbapi.ConnectionPool("pymysql", **dbparms)
-        return cls(dbpool)
+        return cls(dbpool, main_logger)
 
 
     def put_record(self, item):
@@ -44,7 +43,7 @@ class MysqlTwisted():
     def handle_error(self, failure):
         if failure:
             '''
-            self.logger.error("发生了数据库操作错误，嘿嘿嘿")
+            self.main_logger.error("发生了数据库操作错误，嘿嘿嘿")
             print(failure, type(failure))
             '''
 
@@ -56,11 +55,11 @@ class MysqlTwisted():
                     (%s, %s, %s, %s, %s)
                     """
             res_num = cursor.execute(insert_sql, item)
-            self.logger.info("新增结算学习时间资源记录 返回值 %d" % (res_num,))
+            self.main_logger.info("新增结算学习时间资源记录 返回值 %d" % (res_num,))
             return res_num
         except Exception as e:
             func_name = Common.getFuncName()
-            self.logger.error("发生了数据库操作错误，嘿嘿嘿%s --- %s" % (func_name, e))
+            self.main_logger.error("发生了数据库操作错误，嘿嘿嘿%s --- %s" % (func_name, e))
         # res_data = cursor.fetchall()
 
     def do_update_time(self, cursor, item = ()):
@@ -69,18 +68,11 @@ class MysqlTwisted():
                     update `user_info` set study_seconds = %s where user_id = %s
                     """
             res_num = cursor.execute(update_sql, item)
-            self.logger.info("更新当前学习时间资源 返回值 %d" % (res_num,))
+            self.main_logger.info("更新当前学习时间资源 返回值 %d" % (res_num,))
             return res_num
         except Exception as e:
             func_name = Common.getFuncName()
-            self.logger.error("发生了数据库操作错误，嘿嘿嘿%s --- %s" % (func_name, e))
-
-
-
-
-
-
-
+            self.main_logger.error("发生了数据库操作错误，嘿嘿嘿%s --- %s" % (func_name, e))
 
 
     def end_close(self):

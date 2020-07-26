@@ -29,7 +29,7 @@ class Monitor():
         self.interval = interval
         self.study_time = 0 # seconds
         self.logger = Logger('yanzhipeng', 'yzp1.log').getLog()
-        self.mysql = MysqlTwisted.from_settings()
+        self.mysql = MysqlTwisted.from_settings(self.logger)
         self.threadLock = threading.Lock()
 
     def calculate_time(self, behavior = "未知"):
@@ -50,7 +50,7 @@ class Monitor():
             self.mysql.put_record((int(need_toe), "结算一次有效学习时间 " + str(need_toe) + " 秒", 1, 1, ''))
             # 更新个人学习资源时间
             self.mysql.update_time((int(self.study_time), 1))
-        elif 60 < current_time - self.time_queue[-1]:
+        elif 60 > current_time - self.time_queue[-1]:
             pass
         elif 300 <= current_time - self.time_queue[-1]:
             self.time_queue[-1] = current_time
@@ -90,17 +90,18 @@ class Monitor():
 
 m_obj = Monitor()
 
+signal.signal(signal.SIGINT, m_obj.to_end)
+signal.signal(signal.SIGTERM, m_obj.to_end)
+
 
 # 主线程监听和捕获子线程的报错
+'''
 with mouse.Listener(on_move=m_obj.on_move, on_click=m_obj.on_click, on_scroll=m_obj.on_scroll) \
     as listener:
     try:
         reactor.run()
-        signal.signal(signal.SIGINT, m_obj.to_end)
-        signal.signal(signal.SIGTERM, m_obj.to_end)
-        listener.join()
         m_obj.logger.info("鼠标监听子线程启动")
-
+        listener.join()
     except Exception as e:
         # 接收异常
         m_obj.calculate_time("mouse异常")
@@ -109,13 +110,11 @@ with mouse.Listener(on_move=m_obj.on_move, on_click=m_obj.on_click, on_scroll=m_
         m_obj.mysql.end_close()
 
 
-'''
 # 主线程监听和捕获子线程的报错
 with keyboard.Listener(on_press=m_obj.on_press, on_release=m_obj.on_release) as Listener2:
     try:
-        Listener2.join()
         m_obj.logger.info("键盘监听子线程启动")
-
+        Listener2.join()
     except Exception as e:
         m_obj.calculate_time("keyboard异常")
         m_obj.logger.info("keyboard恭喜您，总共累计战斗了 {} 秒有效时间".format(m_obj.study_time))
@@ -124,4 +123,22 @@ with keyboard.Listener(on_press=m_obj.on_press, on_release=m_obj.on_release) as 
 '''
 
 
+threads = []
+mouse_listener = mouse.Listener(on_move=m_obj.on_move, on_click=m_obj.on_click, on_scroll=m_obj.on_scroll)
+keyboard_listener = keyboard.Listener(on_press=m_obj.on_press, on_release=m_obj.on_release)
 
+m_obj.logger.info("yyyyyyyyyyyyyyyyyyyyyyyyyy")
+mouse_listener.start()
+m_obj.logger.info("mouse 子线程监听开启！")
+keyboard_listener.start()
+m_obj.logger.info("keyboard 子线程监听开启！")
+
+threads.append(mouse_listener)
+threads.append(keyboard_listener)
+
+for list in threads:
+    print("yzp")
+    # list.join()
+
+reactor.run()
+print("打卡结束")
