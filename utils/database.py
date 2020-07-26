@@ -9,6 +9,7 @@ from twisted.enterprise import adbapi
 from twisted.internet import reactor
 import pymysql
 from .common import Common
+import configparser
 
 class MysqlTwisted():
 
@@ -18,15 +19,12 @@ class MysqlTwisted():
 
     @classmethod
     def from_settings(cls, main_logger):
-        dbparms = dict(
-            host='127.0.0.1',
-            db='cloud_smile',
-            user='root',
-            passwd='123456',
-            charset='utf8mb4',
-            cursorclass=pymysql.cursors.DictCursor,
-            use_unicode=True,
-        )
+        config = configparser.ConfigParser()
+        config.read("./conf/database.ini")
+        dbparms = config.items('MYSQL')
+        dbparms = dict(dbparms)
+        dbparms.setdefault('cursorclass', pymysql.cursors.DictCursor)
+
         dbpool = adbapi.ConnectionPool("pymysql", **dbparms)
         return cls(dbpool, main_logger)
 

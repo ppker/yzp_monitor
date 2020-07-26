@@ -84,6 +84,7 @@ class Monitor():
         self.calculate_time("退出")
         self.logger.info("恭喜您，总共累计战斗了 {} 秒有效时间".format(self.study_time))
         self.mysql.end_close()
+        reactor.stop()
         sys.exit()
 
 
