@@ -128,7 +128,7 @@ threads = []
 mouse_listener = mouse.Listener(on_move=m_obj.on_move, on_click=m_obj.on_click, on_scroll=m_obj.on_scroll)
 keyboard_listener = keyboard.Listener(on_press=m_obj.on_press, on_release=m_obj.on_release)
 
-m_obj.logger.info("yyyyyyyyyyyyyyyyyyyyyyyyyy")
+m_obj.logger.info("欢迎使用登仙台")
 mouse_listener.start()
 m_obj.logger.info("mouse 子线程监听开启！")
 keyboard_listener.start()
