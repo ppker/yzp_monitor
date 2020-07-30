@@ -3,4 +3,4 @@ test/
 venv/
 utils/__pycache__
 conf/database.ini
-git/hello*
+gui/hello*
