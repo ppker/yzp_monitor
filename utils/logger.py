@@ -24,7 +24,7 @@ class Logger():
         self.log_file = self.log_path + "/" + file_name
 
         fh = logging.FileHandler(self.log_file, encoding="utf-8")
-        fh.setLevel(logging.WARNING)
+        fh.setLevel(logging.INFO)
 
         ch = logging.StreamHandler()
         ch.setLevel(logging.INFO)
@@ -34,7 +34,7 @@ class Logger():
         ch.setFormatter(formatter)
 
         self.logger.addHandler(fh)
-        self.logger.addHandler(ch)
+        # self.logger.addHandler(ch)
 
 
     def getLog(self):
