@@ -13,6 +13,12 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="windowOpacity">
+   <double>0.851230000000000</double>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#Form {background-color: rgb(48,49,51)}</string>
+  </property>
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
@@ -45,11 +51,14 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>70</x>
      <y>10</y>
      <width>241</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(0, 255, 0)</string>
    </property>
    <property name="text">
     <string>^_^ 欢迎使用晓夜        作者：君如水</string>

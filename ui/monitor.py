@@ -15,6 +15,8 @@ class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(400, 300)
+        Form.setWindowOpacity(0.85123)
+        Form.setStyleSheet("#Form {background-color: rgb(48,49,51)}")
         self.pushButton = QtWidgets.QPushButton(Form)
         self.pushButton.setGeometry(QtCore.QRect(220, 240, 113, 32))
         self.pushButton.setObjectName("pushButton")
@@ -23,7 +25,8 @@ class Ui_Form(object):
         self.pushButton_2.setObjectName("pushButton_2")
         self.label = QtWidgets.QLabel(Form)
         self.label.setEnabled(True)
-        self.label.setGeometry(QtCore.QRect(30, 10, 241, 16))
+        self.label.setGeometry(QtCore.QRect(70, 10, 241, 16))
+        self.label.setStyleSheet("color: rgb(0, 255, 0)")
         self.label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label.setIndent(1)
         self.label.setObjectName("label")
