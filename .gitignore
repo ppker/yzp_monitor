@@ -5,3 +5,5 @@ utils/__pycache__
 conf/database.ini
 gui/hello*
 __pycache__/
+dist/
+build/

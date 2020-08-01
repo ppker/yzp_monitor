@@ -7,7 +7,7 @@
 
 from twisted.enterprise import adbapi
 from twisted.internet import reactor
-import pymysql
+import pymysql, os, sys
 from .common import Common
 import configparser
 
@@ -20,7 +20,21 @@ class MysqlTwisted():
     @classmethod
     def from_settings(cls, main_logger):
         config = configparser.ConfigParser()
-        config.read("./conf/database.ini")
+        os.path.abspath(sys.argv[0])
+
+        now_file = os.path.abspath(sys.argv[0])
+        now_dir = os.path.dirname(now_file)
+        # config.read(os.path.join(now_dir, 'database.ini'))
+        config.read_dict({
+            'MYSQL': {
+                'host': '127.0.0.1',
+                'db': 'cloud_smile',
+                'user': 'root',
+                'passwd': '123456',
+                'charset': 'utf8mb4',
+                'use_unicode': True
+            }
+        })
         dbparms = config.items('MYSQL')
         dbparms = dict(dbparms)
         dbparms.setdefault('cursorclass', pymysql.cursors.DictCursor)
