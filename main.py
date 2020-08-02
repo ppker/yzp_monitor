@@ -66,7 +66,7 @@ class Monitor():
 
 
     def on_move(self, x, y):
-        # print("Pointer move to {}".format((x, y)))
+        print("Pointer move to {}".format((x, y)))
         self.calculate_time("鼠标移动")
 
 
@@ -76,7 +76,7 @@ class Monitor():
 
 
     def on_click(self, x, y, button, pressed):
-        # print("{}".format((x, y)), button, pressed)
+        print("{}".format((x, y)), button, pressed)
         self.calculate_time("鼠标点击")
 
     def on_scroll(self, x, y, dx, dy):
