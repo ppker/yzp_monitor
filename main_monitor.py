@@ -54,8 +54,8 @@ class MainUi(QWidget, Ui_Form):
 
     def close_monitor(self):
 
-        self.m_obj.mysql.end_close()
-        reactor.stop()
+        # self.m_obj.mysql.end_close()
+        # reactor.stop()
         app_end = QApplication.instance()
         app_end.quit()
 
@@ -80,21 +80,37 @@ class MyThread(QThread):
         # 线程间信号通信
         # self.my_signal.emit('监控已经启动~')
         # self.lis_keyboard.start()
-        reactor.run()
+        m_obj = Monitor()
+
+        with mouse.Listener(on_move=m_obj.on_move, on_click=m_obj.on_click, on_scroll=m_obj.on_scroll) as listener_mouse:
+            try:
+                listener_mouse.join()
+            except Exception as e:
+                m_obj.logger.join("发送异常进程退出了", e.args)
+
+
+        '''
+        mouse_listener = mouse.Listener(on_move=m_obj.on_move, on_click=m_obj.on_click, on_scroll=m_obj.on_scroll)
+        mouse_listener.start()
+        mouse_listener.join()
+        '''
+        # reactor.run()
 
 
 if __name__ == "__main__":
 
+    '''
     m_obj = Monitor()
     mouse_listener = mouse.Listener(on_move=m_obj.on_move, on_click=m_obj.on_click, on_scroll=m_obj.on_scroll)
     # keyboard_listener = keyboard.Listener(on_press=m_obj.on_press, on_release=m_obj.on_release)
     mouse_listener.start()
     # keyboard_listener.start()
     # reactor.run()
+    '''
 
 
     app = QApplication(sys.argv)
-    main_ul = MainUi(m_obj)
+    main_ul = MainUi(m_obj = None)
     main_ul.show()
     app.setActiveWindow(main_ul)
     sys.exit(app.exec())

@@ -40,6 +40,7 @@ class Monitor():
         """
         目前进行时间判断。心跳间隔1分钟, 心跳超时为5分钟最佳。
         """
+        self.logger.info("{}行为 触发".format(behavior))
         current_time = int(time.time())
         # 先获取锁
         self.threadLock.acquire()
@@ -66,7 +67,7 @@ class Monitor():
 
 
     def on_move(self, x, y):
-        print("Pointer move to {}".format((x, y)))
+        # print("Pointer move to {}".format((x, y)))
         self.calculate_time("鼠标移动")
 
 
