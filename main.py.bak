@@ -9,7 +9,7 @@ from pynput import mouse, keyboard
 import time, threading
 from utils.logger import Logger
 import signal, sys
-from utils.database import MysqlNormal
+from utils.database import MysqlTwisted
 from twisted.internet import reactor
 
 class Monitor():
@@ -21,7 +21,7 @@ class Monitor():
     '''
 
 
-    def __init__(self, custom_signal, interval = 120):
+    def __init__(self, interval = 120):
 
         now_time = int(time.time())
         self.time_queue = []
@@ -29,20 +29,21 @@ class Monitor():
         self.interval = interval
         self.study_time = 0 # seconds
         self.logger = Logger('yanzhipeng', 'yzp1.log').getLog()
-        self.mysql = MysqlNormal.from_settings(self.logger)
+        self.mysql = MysqlTwisted.from_settings(self.logger)
         self.threadLock = threading.Lock()
+
         # 信号体
         self.signal = None
-        self.custom_signal = custom_signal
-        self.logger.info("实例化main 当前线程名字是 {}".format(threading.current_thread().getName()))
+        print("实例化main 当前线程名字是 ", threading.current_thread().getName())
 
     def calculate_time(self, behavior = "未知"):
         """
         目前进行时间判断。心跳间隔1分钟, 心跳超时为5分钟最佳。
         """
+        self.logger.info("{}行为 触发".format(behavior))
         current_time = int(time.time())
         # 先获取锁
-        # self.threadLock.acquire()
+        self.threadLock.acquire()
         if 60 <= current_time - self.time_queue[-1] < 300:
 
             need_toe = int(current_time - self.time_queue[-1])
@@ -51,16 +52,10 @@ class Monitor():
 
             self.logger.info("当前线程名字是 {}".format(threading.current_thread().getName()))
             self.logger.info("{}行为 进行了一次有效的时间累加, 当前累计work时间为 {} 秒".format(behavior, self.study_time))
-            # 进行数据库更新操作
-            add_row = self.mysql.change_data(self.mysql.add_reward_time_sql, (int(need_toe), "结算一次有效学习时间 " + str(need_toe) + " 秒", 1, 1, ''))
-            update_row = self.mysql.change_data(self.mysql.update_reward_time_sql, (int(self.study_time), 1))
-            if add_row:
-                self.custom_signal.emit("结算一次有效学习时间 {} 秒".format(str(need_toe)))
 
-            if update_row:
-                self.custom_signal.emit("当前累计work时间为 {} 秒".format(str(self.study_time)))
-
-
+            self.mysql.put_record((int(need_toe), "结算一次有效学习时间 " + str(need_toe) + " 秒", 1, 1, ''))
+            # 更新个人学习资源时间
+            self.mysql.update_time((int(self.study_time), 1))
         elif 60 > current_time - self.time_queue[-1]:
             pass
         elif 300 <= current_time - self.time_queue[-1]:
@@ -68,12 +63,11 @@ class Monitor():
         else:
             pass
         # 释放锁
-        # self.threadLock.release()
+        self.threadLock.release()
 
 
     def on_move(self, x, y):
         # print("Pointer move to {}".format((x, y)))
-        self.logger.info("我移动到了 {}".format((x, y)))
         self.calculate_time("鼠标移动")
 
 
