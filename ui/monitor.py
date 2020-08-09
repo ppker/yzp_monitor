@@ -39,6 +39,7 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
+        # Form.setWindowIcon(QtGui.QIcon("./smooth_w.png"))
         Form.setWindowTitle(_translate("Form", "晓夜"))
         self.pushButton.setText(_translate("Form", "关闭"))
         self.pushButton_2.setText(_translate("Form", "开始"))

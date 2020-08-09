@@ -107,6 +107,81 @@ class Monitor():
         sys.exit()
 
 
+class GetMouse():
+
+
+    def __init__(self, custom_signal):
+
+        now_time = int(time.time())
+        self.mouse_position = []
+        self.time_queue = []
+        self.time_queue.append(now_time)
+        self.study_time = 0  # seconds
+
+        self.logger = Logger('yanzhipeng', 'yzp1.log').getLog()
+        self.mysql = MysqlNormal.from_settings(self.logger)
+        self.threadLock = threading.Lock()
+
+        # 信号体
+        self.signal = None
+        self.custom_signal = custom_signal
+        self.logger.info("实例化main 当前线程名字是 {}".format(threading.current_thread().getName()))
+
+
+    def calculate_time(self, behavior = "未知"):
+        """
+        进行时间的结算
+        """
+        current_time = int(time.time())
+        # 先获取锁
+        self.threadLock.acquire()
+
+        need_toe = int(current_time - self.time_queue[-1])
+        self.study_time += need_toe
+        self.time_queue[-1] = current_time
+
+        self.logger.info("当前线程名字是 {}".format(threading.current_thread().getName()))
+        self.logger.info("{}行为 进行了一次有效的时间累加, 当前累计work时间为 {} 秒".format(behavior, self.study_time))
+
+        add_row = self.mysql.change_data(self.mysql.add_reward_time_sql,
+                                         (int(need_toe), "结算一次有效学习时间 " + str(need_toe) + " 秒", 1, 1, ''))
+        # 要进行时间的累加 不可直接覆盖更新
+        update_row = self.mysql.change_data(self.mysql.update_reward_time_sql, (int(need_toe), 1))
+        if add_row:
+            self.custom_signal.emit("结算一次有效学习时间 {} 秒".format(str(need_toe)))
+
+        if update_row:
+            self.custom_signal.emit("当前累计work时间为 {} 秒".format(str(self.study_time)))
+
+        self.threadLock.release()
+
+
+    def get_mouse(self):
+
+        # 每3分钟一个时间节点
+        mark = 180
+        while mark >= 0:
+            now_pos = mouse.Controller().position
+            if 0 == len(self.mouse_position):
+                self.mouse_position.append(now_pos)
+                # print(len(self.mouse_position), self.mouse_position)
+            elif self.mouse_position[-1] != now_pos:
+                self.mouse_position.append(now_pos)
+
+            # self.logger.info("鼠标当前的位置为 {}".format(now_pos))
+            # self.logger.info("鼠标移动轨迹为 {}".format(self.mouse_position))
+            time.sleep(3)
+            mark -= 3
+
+        # 进行存数
+        if len(self.mouse_position) > 1:
+            self.logger.info("鼠标移动轨迹为 {}".format(self.mouse_position))
+            self.mouse_position = []
+            self.calculate_time("鼠标移动")
+        else:
+            self.mouse_position = []
+
+
 
 if __name__ == "__main__":
 

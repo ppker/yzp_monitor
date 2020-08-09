@@ -104,7 +104,7 @@ class MysqlNormal():
         self.main_logger = main_logger
         self.add_reward_time_sql = '''insert into `base_settlement_record` (`new_value`, `description`, `type`, `user_id`, `mark`) values 
                     (%s, %s, %s, %s, %s)'''
-        self.update_reward_time_sql = '''update `user_info` set study_seconds = %s where user_id = %s'''
+        self.update_reward_time_sql = '''update `user_info` set study_seconds = study_seconds + %s where user_id = %s'''
 
     @classmethod
     def from_settings(cls, main_logger):
