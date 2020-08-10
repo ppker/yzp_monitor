@@ -141,7 +141,7 @@ class GetMouse():
         self.time_queue[-1] = current_time
 
         self.logger.info("当前线程名字是 {}".format(threading.current_thread().getName()))
-        self.logger.info("{}行为 进行了一次有效的时间累加, 当前累计work时间为 {} 秒".format(behavior, self.study_time))
+        self.logger.info("{}行为 进行了一次有效的 {}秒 时间累加, 当前累计work时间为 {} 秒".format(behavior, need_toe, self.study_time))
 
         add_row = self.mysql.change_data(self.mysql.add_reward_time_sql,
                                          (int(need_toe), "结算一次有效学习时间 " + str(need_toe) + " 秒", 1, 1, ''))
@@ -180,6 +180,14 @@ class GetMouse():
             self.calculate_time("鼠标移动")
         else:
             self.mouse_position = []
+            # 时间也要进行更新，清除无效时间
+            self.update_time()
+
+    def update_time(self):
+        current_time = int(time.time())
+        self.time_queue[-1] = current_time
+
+
 
 
 

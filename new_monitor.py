@@ -71,7 +71,7 @@ class MyThread(QThread):
         m_obj = GetMouse(self.my_signal)
         self.my_signal.emit("装载子线程监控~")
 
-        for i in range(5):
+        for i in range(2000):
             m_obj.get_mouse()
 
         self.my_signal.emit("子线程监控已停止~")
