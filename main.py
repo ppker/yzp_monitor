@@ -11,6 +11,7 @@ from utils.logger import Logger
 import signal, sys
 from utils.database import MysqlNormal
 from twisted.internet import reactor
+from PyQt5.QtCore import QThread
 
 class Monitor():
 
@@ -159,9 +160,18 @@ class GetMouse():
     def get_mouse(self):
 
         # 每3分钟一个时间节点
-        mark = 180
-        while mark >= 0:
+        begin_mark_time = int(time.time())
+        mark = 60
+        mark_count = 0
+        while (mark > 0):
             now_pos = mouse.Controller().position
+            # 保留两位小数
+            if now_pos:
+                now_pos_list = list(now_pos)
+                now_pos_list[0] = round(now_pos_list[0], 2)
+                now_pos_list[1] = round(now_pos_list[1], 2)
+                now_pos = tuple(now_pos_list)
+
             if 0 == len(self.mouse_position):
                 self.mouse_position.append(now_pos)
                 # print(len(self.mouse_position), self.mouse_position)
@@ -170,12 +180,16 @@ class GetMouse():
 
             # self.logger.info("鼠标当前的位置为 {}".format(now_pos))
             # self.logger.info("鼠标移动轨迹为 {}".format(self.mouse_position))
+            # QThread.sleep(3)
             time.sleep(3)
-            mark -= 3
+            # time.sleep(3)
+            mark = mark - 3
+            mark_count = mark_count + 1
 
         # 进行存数
+        end_mark_time = int(time.time())
         if len(self.mouse_position) > 1:
-            self.logger.info("鼠标移动轨迹为 {}".format(self.mouse_position))
+            self.logger.info("鼠标移动轨迹为 {} 结算周期时间为 {} 鼠标次数是 {} ".format(self.mouse_position, end_mark_time - begin_mark_time, mark_count))
             self.mouse_position = []
             self.calculate_time("鼠标移动")
         else:

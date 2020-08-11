@@ -30,8 +30,8 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=False )
+          console=False , icon='soom.icns')
 app = BUNDLE(exe,
              name='new_monitor.app',
-             icon=None,
+             icon='soom.icns',
              bundle_identifier=None)
