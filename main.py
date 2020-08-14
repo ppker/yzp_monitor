@@ -157,12 +157,15 @@ class GetMouse():
         self.threadLock.release()
 
 
-    def get_mouse(self):
+    def get_mouse(self, heartbeat = 1):
 
         # 每3分钟一个时间节点
         begin_mark_time = int(time.time())
         mark = 60
         mark_count = 0
+
+        # 换用新的时间心跳策略
+        future_time = begin_mark_time + 60 * heartbeat
         while (mark > 0):
             now_pos = mouse.Controller().position
             # 保留两位小数
@@ -183,7 +186,11 @@ class GetMouse():
             # QThread.sleep(3)
             time.sleep(3)
             # time.sleep(3)
-            mark = mark - 3
+            # mark = mark - 3
+
+            if int(time.time()) >= future_time:
+                mark = 0
+
             mark_count = mark_count + 1
 
         # 进行存数
